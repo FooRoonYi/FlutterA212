@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:soleilshop/views/loginscreen.dart';
-import 'package:soleilshop/views/productscreen.dart';
-import 'package:soleilshop/views/registerpage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,7 +40,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
     Timer(
         const Duration(seconds: 3),
         () => Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (content) => const RegisterPage())));
+            MaterialPageRoute(builder: (content) => const LoginScreen())));
   }
 
   @override

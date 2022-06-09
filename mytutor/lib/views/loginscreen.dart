@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mytutor/constants.dart';
 import 'package:mytutor/models/user.dart';
+import 'package:mytutor/views/mainscreen.dart';
 import 'package:mytutor/views/userregistrationscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -201,13 +202,19 @@ class _LoginScreenPageState extends State<LoginScreenPage> {
           body: {"email": _email, "password": _password}).then((response) {
         var data = jsonDecode(response.body);
         if (response.statusCode == 200 && data['status'] == 'success') {
-          //User user = User.fromJson(data['data']);
+          User user = User.fromJson(data['data']);
           Fluttertoast.showToast(
               msg: "Success",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
               fontSize: 16.0);
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => MainScreen(
+                        user: user,
+                      )));
         } else {
           Fluttertoast.showToast(
               msg: "Failed",
