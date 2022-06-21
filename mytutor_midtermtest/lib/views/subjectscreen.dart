@@ -22,6 +22,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
   late int gridcount;
   TextEditingController searchController = TextEditingController();
   String search = "";
+  String name = "";
   String dropdownvalue = 'Programming 101';
   var types = [
     'Programming 101',
@@ -167,7 +168,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
     curpage = pageno;
     numofpage ?? 1;
     http.post(
-        Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/load_subjects.php"),
+        Uri.parse("${CONSTANTS.server}/mytutor/mobile/php/load_subjects.php"),
         body: {
           'pageno': pageno.toString(),
           'search': _search,
@@ -227,37 +228,31 @@ class _SubjectScreenState extends State<SubjectScreen> {
                 const SizedBox(height: 20),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
-                    "Subject ID: " + subjectList[index].subjectId.toString(),
+                    "Subject ID: ${subjectList[index].subjectId}",
                     textAlign: TextAlign.justify,
                   ),
                   Text(
-                    "\nSubject Name: " +
-                        subjectList[index].subjectName.toString(),
+                    "\nSubject Name: ${subjectList[index].subjectName}",
                     textAlign: TextAlign.justify,
                   ),
                   Text(
-                    "\nSubject Description: \n" +
-                        subjectList[index].subjectDescription.toString(),
+                    "\nSubject Description: \n${subjectList[index].subjectDescription}",
                     textAlign: TextAlign.justify,
                   ),
                   Text(
-                    "\nSubject Price: RM " +
-                        double.parse(subjectList[index].subjectPrice.toString())
-                            .toStringAsFixed(2),
+                    "\nSubject Price: RM ${double.parse(subjectList[index].subjectPrice.toString()).toStringAsFixed(2)}",
                     textAlign: TextAlign.justify,
                   ),
                   Text(
-                    "\nTutor ID: " + subjectList[index].tutorId.toString(),
+                    "\nTutor ID: ${subjectList[index].tutorId}",
                     textAlign: TextAlign.justify,
                   ),
                   Text(
-                    "\nSubject Sessions: " +
-                        subjectList[index].subjectSessions.toString(),
+                    "\nSubject Sessions: ${subjectList[index].subjectSessions}",
                     textAlign: TextAlign.justify,
                   ),
                   Text(
-                    "\nSubject Rating: " +
-                        subjectList[index].subjectRating.toString(),
+                    "\nSubject Rating: ${subjectList[index].subjectRating}",
                     textAlign: TextAlign.justify,
                   ),
                 ])

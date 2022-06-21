@@ -38,6 +38,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: tabchildren[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
+        height: 50,
         animationCurve: Curves.easeInOut,
         animationDuration: const Duration(milliseconds: 300),
         backgroundColor: Colors.indigo,

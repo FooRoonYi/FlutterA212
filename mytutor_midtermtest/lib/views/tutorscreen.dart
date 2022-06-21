@@ -105,15 +105,10 @@ class _TutorScreenState extends State<TutorScreen> {
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           Text(
-                                            "Email: " +
-                                                tutList[index]
-                                                    .tutorEmail
-                                                    .toString(),
+                                            "Email: ${tutList[index].tutorEmail}",
                                           ),
-                                          Text("Phone: " +
-                                              tutList[index]
-                                                  .tutorPhone
-                                                  .toString()),
+                                          Text(
+                                              "Phone: ${tutList[index].tutorPhone}"),
                                         ],
                                       ))
                                 ],
@@ -152,7 +147,7 @@ class _TutorScreenState extends State<TutorScreen> {
     curpage = pageno;
     numofpage ?? 1;
     http.post(
-        Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/load_tutors.php"),
+        Uri.parse("${CONSTANTS.server}/mytutor/mobile/php/load_tutors.php"),
         body: {
           'pageno': pageno.toString(),
           'search': _search,
@@ -217,28 +212,30 @@ class _TutorScreenState extends State<TutorScreen> {
                 ),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
-                    "Tutor ID: " + tutList[index].tutorId.toString(),
+                    "Tutor ID: ${tutList[index].tutorId}",
                     textAlign: TextAlign.justify,
                   ),
                   Text(
-                    "\nTutor Email: " + tutList[index].tutorEmail.toString(),
+                    "\nTutor Email: ${tutList[index].tutorEmail}",
                   ),
                   Text(
-                    "\nTutor Phone: " + tutList[index].tutorPhone.toString(),
+                    "\nTutor Phone: ${tutList[index].tutorPhone}",
                     textAlign: TextAlign.justify,
                   ),
                   Text(
-                    "\nTutor Name: " + tutList[index].tutorName.toString(),
+                    "\nTutor Name: ${tutList[index].tutorName}",
                     textAlign: TextAlign.justify,
                   ),
                   Text(
-                    "\nTutor Description: \n" +
-                        tutList[index].tutorDescription.toString(),
+                    "\nTutor Description: \n${tutList[index].tutorDescription}",
                     textAlign: TextAlign.justify,
                   ),
-                  Text("\nTutor Date Registration: \n" +
-                      df.format(DateTime.parse(
-                          tutList[index].tutorDatereg.toString()))),
+                  Text(
+                      "\nTutor Date Registration: \n${df.format(DateTime.parse(tutList[index].tutorDatereg.toString()))}"),
+                  Text(
+                    "\nSubject List: \n${tutList[index].subjectName}\n",
+                    textAlign: TextAlign.justify,
+                  ),
                 ]),
               ],
             )),
