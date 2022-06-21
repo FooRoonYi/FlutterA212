@@ -266,7 +266,7 @@ class _TutorScreenState extends State<TutorScreen> {
                   "Search ",
                 ),
                 content: SizedBox(
-                  height: screenHeight / 3,
+                  height: screenHeight / 5,
                   child: Column(
                     children: [
                       TextField(
