@@ -1,13 +1,19 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:mytutor_midtermtest/views/cartscreen.dart';
+import 'package:mytutor_midtermtest/views/loginscreen.dart';
+import 'package:mytutor_midtermtest/views/userregistrationscreen.dart';
 
 import '../constants.dart';
 import '../models/subject.dart';
+import '../models/user.dart';
 
 class SubjectScreen extends StatefulWidget {
-  const SubjectScreen({Key? key}) : super(key: key);
+  final User user;
+  const SubjectScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   State<SubjectScreen> createState() => _SubjectScreenState();
@@ -44,7 +50,9 @@ class _SubjectScreenState extends State<SubjectScreen> {
   @override
   void initState() {
     super.initState();
-    _loadSubjects(1, search);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _loadSubjects(1, search);
+    });
   }
 
   @override
@@ -60,6 +68,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
     }
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: true,
         title: const Text('Subjects'),
         backgroundColor: Colors.indigo,
         actions: [
@@ -68,7 +77,29 @@ class _SubjectScreenState extends State<SubjectScreen> {
             onPressed: () {
               _loadSearchDialog();
             },
-          )
+          ),
+          TextButton.icon(
+            onPressed: () async {
+              if (widget.user.email == "guest@mytutorapp.com") {
+                _loadOptions();
+              } else {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => CartScreen(
+                              user: widget.user,
+                            )));
+                _loadSubjects(1, search);
+                _loadMyCart();
+              }
+            },
+            icon: const Icon(
+              Icons.shopping_cart,
+              color: Colors.white,
+            ),
+            label: Text(widget.user.cart.toString(),
+                style: const TextStyle(color: Colors.white)),
+          ),
         ],
       ),
       body: subjectList.isEmpty
@@ -116,20 +147,26 @@ class _SubjectScreenState extends State<SubjectScreen> {
                                       flex: 4,
                                       child: Column(
                                         children: [
+                                          const SizedBox(height: 10),
                                           Text(
                                             subjectList[index]
                                                 .subjectName
                                                 .toString(),
                                             style: const TextStyle(
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.bold),
                                             textAlign: TextAlign.center,
                                           ),
+                                          const SizedBox(height: 10),
                                           Text(
-                                              "RM ${double.parse(subjectList[index].subjectPrice.toString()).toStringAsFixed(2)}"),
+                                              "RM ${double.parse(subjectList[index].subjectPrice.toString()).toStringAsFixed(2)}",
+                                              textAlign: TextAlign.left),
                                           Text(
-                                              "Session: ${subjectList[index].subjectSessions}"),
+                                              "Session: ${subjectList[index].subjectSessions}",
+                                              textAlign: TextAlign.left),
                                           Text(
-                                              "Rating: ${subjectList[index].subjectRating}"),
+                                              "Rating: ${subjectList[index].subjectRating}",
+                                              textAlign: TextAlign.left),
                                         ],
                                       )),
                                 ],
@@ -146,7 +183,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
                     if ((curpage - 1) == index) {
                       color = Colors.red;
                     } else {
-                      color = Colors.black;
+                      color = Colors.indigo;
                     }
                     return SizedBox(
                       width: 40,
@@ -198,6 +235,29 @@ class _SubjectScreenState extends State<SubjectScreen> {
         //do something
       }
     });
+  }
+
+  _loadOptions() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            title: const Text(
+              "Please select",
+              style: TextStyle(),
+            ),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(onPressed: _onLogin, child: const Text("Login")),
+                ElevatedButton(
+                    onPressed: _onRegister, child: const Text("Register")),
+              ],
+            ),
+          );
+        });
   }
 
   _loadSubjectDetails(int index) {
@@ -259,15 +319,13 @@ class _SubjectScreenState extends State<SubjectScreen> {
               ],
             )),
             actions: [
-              TextButton(
-                child: const Text(
-                  "Close",
-                  style: TextStyle(),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
+              SizedBox(
+                  width: screenWidth / 1,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        _addtocartDialog(index);
+                      },
+                      child: const Text("Add to cart"))),
             ],
           );
         });
@@ -311,5 +369,78 @@ class _SubjectScreenState extends State<SubjectScreen> {
             },
           );
         });
+  }
+
+  void _addtocartDialog(int index) {
+    if (widget.user.email == "guest@mytutorapp.com") {
+      _loadOptions();
+    } else {
+      _addtoCart(index);
+    }
+  }
+
+  void _onLogin() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (content) => const LoginScreen()));
+  }
+
+  void _onRegister() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (content) => const UserResgisterScreen()));
+  }
+
+  void _addtoCart(int index) {
+    http.post(
+        Uri.parse("${CONSTANTS.server}/mytutor/mobile/php/insert_cart.php"),
+        body: {
+          "email": widget.user.email.toString(),
+          "subject_id": subjectList[index].subjectId.toString(),
+        }).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        return http.Response(
+            'Error', 408); // Request Timeout response status code
+      },
+    ).then((response) {
+      print(response.body);
+      var jsondata = jsonDecode(response.body);
+      if (response.statusCode == 200 && jsondata['status'] == 'success') {
+        print(jsondata['data']['carttotal'].toString());
+        setState(() {
+          widget.user.cart = jsondata['data']['carttotal'].toString();
+        });
+        Fluttertoast.showToast(
+            msg: "Added into the cart successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+      }
+    });
+  }
+
+  void _loadMyCart() {
+    if (widget.user.email != "guest@mytutorapp.com") {
+      http.post(
+          Uri.parse("${CONSTANTS.server}/mytutor/mobile/php/load_cartqty.php"),
+          body: {
+            "email": widget.user.email.toString(),
+          }).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          return http.Response(
+              'Error', 408); // Request Timeout response status code
+        },
+      ).then((response) {
+        print(response.body);
+        var jsondata = jsonDecode(response.body);
+        if (response.statusCode == 200 && jsondata['status'] == 'success') {
+          print(jsondata['data']['carttotal'].toString());
+          setState(() {
+            widget.user.cart = jsondata['data']['carttotal'].toString();
+          });
+        }
+      });
+    }
   }
 }

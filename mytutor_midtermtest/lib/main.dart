@@ -1,8 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mytutor_midtermtest/views/loginscreen.dart';
+import 'package:mytutor_midtermtest/home.dart';
+import 'package:mytutor_midtermtest/models/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'constants.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,13 +40,13 @@ class MySplashScreen extends StatefulWidget {
 }
 
 class _MySplashScreenState extends State<MySplashScreen> {
+  bool remember = false;
+  String status = "Loading...";
+
   @override
   void initState() {
     super.initState();
-    Timer(
-        const Duration(seconds: 5),
-        () => Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (content) => const LoginScreen())));
+    Timer(const Duration(seconds: 3), () => loadPref());
   }
 
   @override
@@ -79,5 +85,67 @@ class _MySplashScreenState extends State<MySplashScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> loadPref() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String email = (prefs.getString('email')) ?? '';
+    String password = (prefs.getString('pass')) ?? '';
+    remember = (prefs.getBool('remember')) ?? false;
+
+    if (remember) {
+      setState(() {
+        status = "Credentials found, auto log in...";
+      });
+      _loginUser(email, password);
+    } else {
+      _loginUser(email, password);
+      setState(() {
+        status = "Login as guest...";
+      });
+    }
+  }
+
+  _loginUser(email, password) {
+    http.post(
+        Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/login_user.php"),
+        body: {"email": email, "password": password}).then((response) {
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['status'] == 'success') {
+        var extractdata = data['data'];
+        User user = User.fromJson(extractdata);
+        Fluttertoast.showToast(
+            msg: "Successfully logged into MyTutor App!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (content) => Home(
+                      user: user,
+                    )));
+      } else {
+        User user = User(
+            id: '0',
+            name: 'guest',
+            email: 'guest@mytutorapp.com',
+            datereg: '0',
+            cart: '0');
+        Fluttertoast.showToast(
+            msg: "You're in the Guest Mode!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (content) => Home(
+                      user: user,
+                    )));
+      }
+    });
   }
 }

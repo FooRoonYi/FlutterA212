@@ -213,7 +213,7 @@ class _LoginScreenPageState extends State<LoginScreenPage> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => const Home()));
+                  builder: (BuildContext context) => Home(user: user)));
         } else {
           Fluttertoast.showToast(
               msg: "Failed",

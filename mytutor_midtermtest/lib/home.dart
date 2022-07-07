@@ -6,8 +6,11 @@ import 'package:mytutor_midtermtest/views/subscribescreen.dart';
 import 'package:mytutor_midtermtest/views/tutorscreen.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
+import 'models/user.dart';
+
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  final User user;
+  const Home({Key? key, required this.user}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -22,12 +25,12 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    tabchildren = const [
-      SubjectScreen(),
-      TutorScreen(),
-      SubscribeScreen(),
-      FavouriteScreen(),
-      ProfileScreen(),
+    tabchildren = [
+      SubjectScreen(user: widget.user),
+      const TutorScreen(),
+      const SubscribeScreen(),
+      const FavouriteScreen(),
+      const ProfileScreen(),
     ];
   }
 
