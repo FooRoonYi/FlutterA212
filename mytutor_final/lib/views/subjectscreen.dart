@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:mytutor_final/home.dart';
 import 'package:mytutor_final/views/cartscreen.dart';
 import 'package:mytutor_final/views/loginscreen.dart';
 import 'package:mytutor_final/views/userresgistrationscreen.dart';
@@ -251,9 +252,18 @@ class _SubjectScreenState extends State<SubjectScreen> {
             content: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                ElevatedButton(onPressed: _onLogin, child: const Text("Login")),
                 ElevatedButton(
-                    onPressed: _onRegister, child: const Text("Register")),
+                    onPressed: _onLogin,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.indigo,
+                    ),
+                    child: const Text("Login")),
+                ElevatedButton(
+                    onPressed: _onRegister,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.indigo,
+                    ),
+                    child: const Text("Register")),
               ],
             ),
           );
@@ -325,6 +335,9 @@ class _SubjectScreenState extends State<SubjectScreen> {
                       onPressed: () {
                         _addtocartDialog(index);
                       },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.indigo,
+                      ),
                       child: const Text("Add to cart"))),
             ],
           );
@@ -375,8 +388,54 @@ class _SubjectScreenState extends State<SubjectScreen> {
     if (widget.user.email == "guest@mytutorapp.com") {
       _loadOptions();
     } else {
-      _addtoCart(index);
+      _addtoCartConfirmDialog(index);
     }
+  }
+
+  _addtoCartConfirmDialog(int index) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            title: const Text(
+              "Are you sure?",
+            ),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                    onPressed: () {
+                      _onYes(index);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.indigo,
+                    ),
+                    child: const Text("Yes")),
+                ElevatedButton(
+                    onPressed: _onNo,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.indigo,
+                    ),
+                    child: const Text("No")),
+              ],
+            ),
+          );
+        });
+  }
+
+  void _onYes(int index) {
+    _addtoCart(index);
+  }
+
+  void _onNo() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (content) => Home(
+                  user: widget.user,
+                )));
   }
 
   void _onLogin() {

@@ -94,7 +94,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
 
     if (remember) {
       setState(() {
-        status = "Credentials found, auto log in...";
+        status = "Credentials found, auto logging in...";
       });
       _loginUser(email, password);
     } else {
